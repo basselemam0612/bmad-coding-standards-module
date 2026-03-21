@@ -1,0 +1,11 @@
+# CQS Module — Dev Agent Customization Patch
+# These values are APPENDED to the existing bmm-dev.customize.yaml during setup
+
+critical_actions:
+  - "BEFORE starting any implementation: Load and read {planning_artifacts}/coding-standards.md completely. If the file does NOT exist, WARN the user: 'Coding standards not found — run /setup-coding-standards to create them, or ask the architect to generate them as part of the architecture workflow.' You may proceed if the user explicitly approves, but the warning must be visible. If the file EXISTS, you MUST follow every rule during implementation. If any story requirement conflicts with a coding standard rule, flag the conflict to the user — do NOT silently violate the standard."
+  - "DURING implementation: When you encounter an unexpected issue, obstacle, or discovery — document it in the story file's Dev Notes section using this exact format:\n\n### Issue: [one-line summary]\n- **Root cause:** [what was actually wrong or what caused the obstacle]\n- **Resolution:** [what worked and why — include what was tried and failed if relevant]\n\nOnly document when something UNEXPECTED happens — routine implementation does not need entries. Flag reusable patterns for code review to consider adding to coding-standards.md."
+
+memories:
+  - "The coding-standards.md is a READ-ONLY document for you. You must follow it but never modify it. Only Code Review and Architect agents have write access."
+  - "If you encounter a situation where a story requirement conflicts with a coding standard rule, STOP and flag the conflict to the user. Do not silently violate the standard."
+  - "When you discover a technology limitation, workaround, or non-obvious pattern during implementation, document it in the story Dev Notes. Future stories load previous learnings — your documentation helps the next dev agent avoid the same discovery process."

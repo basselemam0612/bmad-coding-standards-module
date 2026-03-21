@@ -1,0 +1,16 @@
+name: setup-coding-standards
+description: 'Set up a living coding standards system with agent enforcement. Use when the user says "set up coding standards" or "initialize coding standards"'
+
+# Critical variables from config
+config_source: "{project-root}/_bmad/bmm/config.yaml"
+user_name: "{config_source}:user_name"
+communication_language: "{config_source}:communication_language"
+document_output_language: "{config_source}:document_output_language"
+planning_artifacts: "{config_source}:planning_artifacts"
+
+# Workflow components
+installed_path: "{project-root}/_bmad/cqs/workflows/setup-coding-standards"
+instructions: "{installed_path}/steps/step-01-scan-project.md"
+template: "{installed_path}/templates/coding-standards.template.md"
+
+project_context: "**/project-context.md"

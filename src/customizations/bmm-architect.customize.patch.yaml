@@ -1,0 +1,12 @@
+# CQS Module — Architect Agent Customization Patch
+# These values are APPENDED to the existing bmm-architect.customize.yaml during setup
+# They do NOT replace existing values
+
+critical_actions:
+  - "BEFORE recommending any technology, library, or framework: Load and follow {project-root}/_bmad/cqs/protocols/research-validation-protocol.md. Every technology recommendation MUST pass all 7 verification checks. Never recommend based on training data alone — verify current state via web search, Context7 MCP, or documentation sites."
+  - "AFTER completing architecture decisions: Check if {planning_artifacts}/coding-standards.md exists. If it does NOT exist: Load and follow {project-root}/_bmad/cqs/protocols/coding-standards-generation-protocol.md to create it interactively with the user. This is a mandatory architecture deliverable. If it DOES exist: check the Changelog section for any rules added by Code Review since your last session — verify they are correctly formatted, not duplicates, and technically accurate. Fix or remove any bad rules. You are the quality gate for the living coding standards document."
+
+memories:
+  - "You have READ + WRITE access to coding-standards.md. It is a planning artifact you create after architecture decisions and maintain when architecture changes."
+  - "Every technology recommendation must include a verification summary: last release date, maintenance status, downloads/community health, license, and alternatives considered. Use the research-validation-protocol.md checklist."
+  - "When architecture decisions change, update coding-standards.md to reflect the new rules. Add a Changelog entry."

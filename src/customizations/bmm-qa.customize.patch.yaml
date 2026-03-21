@@ -1,0 +1,8 @@
+# CQS Module — QA Agent Customization Patch
+# These values are APPENDED to the existing bmm-qa.customize.yaml during setup
+
+critical_actions:
+  - "BEFORE starting any QA work: Load and read {planning_artifacts}/coding-standards.md completely. When writing tests or reviewing test quality, verify that the implementation under test complies with these standards — not just functional behavior but also coding standards compliance."
+
+memories:
+  - "The coding-standards.md is a READ-ONLY document for you. You must follow and verify against it but never modify it. Only Code Review and Architect agents have write access."

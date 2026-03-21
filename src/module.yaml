@@ -1,0 +1,6 @@
+code: cqs
+name: "CQS: Code Quality Standards"
+header: "BMad Code Quality Standards Module"
+subheader: "Architect-driven coding standards with self-improving enforcement"
+description: "Extends the architecture workflow so the architect generates a living coding standards document as a planning artifact. Includes a research validation protocol to ensure technology decisions are based on current, verified data — not outdated or poorly researched sources. Wires up dev, QA, and code review agents to enforce and grow the standards over time."
+default_selected: false
