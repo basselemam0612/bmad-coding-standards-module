@@ -106,6 +106,77 @@ Add `previous_retrospective` as the FIRST entry in `input_file_patterns`:
     load_strategy: "SELECTIVE_LOAD"
 ```
 
+## Patch Workflow Instructions (Critical Enforcement)
+
+These patches ensure the workflow instructions.xml files explicitly enforce coding standards at runtime.
+Without these, the workflow.yaml input_file_patterns load the file but the instructions never reference it.
+
+### dev-story instructions.xml
+
+Edit `{project-root}/_bmad/bmm/workflows/4-implementation/dev-story/instructions.xml`:
+
+**In Step 2** (goal: "Load project context"):
+1. Change the step goal to: `"Load project context, coding standards, and story information"`
+2. Add `<invoke-protocol name="discover_inputs" />` as the FIRST action in the step (this loads coding_standards from workflow.yaml input_file_patterns)
+3. Add after the invoke-protocol, BEFORE the existing project_context action:
+```xml
+    <critical>coding-standards.md is MANDATORY — you MUST follow every rule during implementation</critical>
+    <check if="coding_standards content was loaded by discover_inputs">
+      <action>Internalize ALL rules from coding-standards.md — every DO/DON'T directive applies to your implementation</action>
+      <action>Pay special attention to rules sourced from "Code Review" — these are patterns previous dev agents violated</action>
+    </check>
+    <check if="coding_standards content was NOT found by discover_inputs">
+      <output>⚠️ **WARNING:** coding-standards.md not found. Run /setup-coding-standards or ask the architect to generate it.</output>
+      <ask>Proceed without coding standards? (y/n)</ask>
+      <action if="user says no">HALT</action>
+    </check>
+```
+
+**In Step 5** (goal: "Implement task"):
+Find the REFACTOR PHASE section and replace `"Ensure code follows architecture patterns and coding standards from Dev Notes"` with:
+```xml
+    <action>Ensure code follows architecture patterns from Dev Notes</action>
+    <critical>Cross-check implementation against EVERY applicable rule in coding-standards.md — violations found by code review become permanent rules, so repeating them is unacceptable</critical>
+    <action>Verify: correct components (FE rules), proper validation (BE rules), security patterns (SC rules), testing patterns (TS rules), and all universal rules (U rules)</action>
+```
+
+### code-review instructions.xml
+
+Edit `{project-root}/_bmad/bmm/workflows/4-implementation/code-review/instructions.xml`:
+
+**Add a NEW step between the current "Present findings" step and the "Update story status" step.**
+Renumber the old final step accordingly. The new step:
+```xml
+  <step n="5" goal="Update coding-standards.md with new violation patterns">
+    <critical>This step closes the feedback loop — violations you find HERE prevent the dev agent from repeating them in FUTURE stories</critical>
+
+    <action>Review all findings from Steps 3-4 and identify violation patterns NOT already covered by an existing rule in coding-standards.md</action>
+    <action>Check the story file's Dev Notes section — if the dev documented workarounds or technology limitations:
+      1. Verify the resolution was the correct approach
+      2. Determine if the pattern should become a new coding standard rule
+    </action>
+
+    <check if="new violation patterns found that are NOT covered by existing rules">
+      <action>For EACH new pattern, draft a new rule in the correct section of coding-standards.md:
+        - Assign next available ID in that section (e.g., if last is FE-012, new is FE-013)
+        - Follow the DO/DON'T/WHY/SOURCE format exactly
+        - Set SOURCE to "Code Review — Story {{story_key}} ({{date}})"
+      </action>
+      <action>Add a Changelog entry at the bottom of coding-standards.md:
+        "{{date}} — Added [rule IDs] from {{story_key}} code review"
+      </action>
+      <action>Save coding-standards.md</action>
+      <output>📝 **Coding Standards Updated:** Added {{new_rule_count}} new rules to coding-standards.md
+        {{list of new rule IDs and one-line descriptions}}
+      </output>
+    </check>
+
+    <check if="no new violation patterns found">
+      <output>✅ All violations already covered by existing coding standards rules</output>
+    </check>
+  </step>
+```
+
 ## Update Workflow Checklists
 
 ### dev-story checklist
@@ -165,10 +236,14 @@ Updated Agents:
   bmm-quick-flow   — Coding standards enforcement (READ) + issue documentation in spec notes
 
 Updated Workflows:
-  dev-story        — Loads coding-standards.md before implementation
-  code-review      — Loads coding-standards.md + checks Dev Notes + appends new rules
+  dev-story        — Loads coding-standards.md before implementation + enforces rules during refactor phase
+  code-review      — Loads coding-standards.md + checks Dev Notes + appends new rules + explicit write-back step
   retrospective    — Loads story Dev Notes as primary retro data
   create-story     — Loads previous retrospective for cross-epic learning
+
+Patched Instructions:
+  dev-story/instructions.xml    — Added discover_inputs protocol + coding standards enforcement in Steps 2 & 5
+  code-review/instructions.xml  — Added new Step 5 for writing violations back to coding-standards.md
 
 Installed Protocols:
   research-validation-protocol.md — Architect tech research checklist
