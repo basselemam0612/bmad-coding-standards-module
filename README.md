@@ -110,7 +110,7 @@ src/
 
 5. **Research protocols require web access for full effectiveness** — Without web search or Context7 MCP, protocols operate in degraded mode where recommendations are marked as unverified. Still valuable for structured thinking, but cannot verify current technology status.
 
-6. **Tested with BMAD v6.0.4** — Compatibility with other versions is untested.
+6. **Tested with BMAD v6.2.0** — Compatibility with other versions is untested.
 
 ## Suggestions for BMAD Core
 
