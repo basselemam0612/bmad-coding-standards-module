@@ -101,7 +101,7 @@ Edit `{project-root}/_bmad/bmm/workflows/4-implementation/create-story/workflow.
 Add `previous_retrospective` as the FIRST entry in `input_file_patterns`:
 ```yaml
   previous_retrospective:
-    description: "Most recent completed retrospective. Contains process improvements, lessons learned, and action items from the previous epic. Use these insights to create better-scoped stories with clearer acceptance criteria and to avoid repeating past mistakes."
+    description: "Load ONLY the most recent completed retrospective (highest epic number). Each retro already contains cumulative learnings from all previous retros, so only the latest is needed. Use its process improvements and action items to create better-scoped stories and avoid repeating past mistakes."
     pattern: "{implementation_artifacts}/*retro*.md"
     load_strategy: "SELECTIVE_LOAD"
 ```
@@ -142,11 +142,18 @@ Add to Test Quality section:
 - [ ] Tests verify coding standards compliance where applicable (correct components, brand colors, permission gating)
 ```
 
-## Copy Research Validation Protocol
+## Verify Protocol Files
 
-Copy `{installed_path}/../protocols/research-validation-protocol.md` to `{project-root}/_bmad/cqs/protocols/research-validation-protocol.md`.
+Verify that the following protocol files exist at their expected locations (they should have been copied during module installation):
 
-This makes the protocol available at the path referenced in the architect's critical_action.
+- `{project-root}/_bmad/cqs/protocols/research-validation-protocol.md`
+- `{project-root}/_bmad/cqs/protocols/coding-standards-generation-protocol.md`
+
+If they do NOT exist (the BMAD installer may not copy all module subfolders), copy them manually:
+- Source: `{project-root}/_bmad/cqs/workflows/setup-coding-standards/../../protocols/` (the module's protocols folder)
+- Destination: `{project-root}/_bmad/cqs/protocols/`
+
+These files are referenced by the architect's critical_actions and must be accessible at `{project-root}/_bmad/cqs/protocols/`.
 
 ## Present Summary
 

@@ -47,13 +47,30 @@ npx bmad-method install --custom-content /path/to/bmad-coding-standards-module/s
 
 ## Usage
 
-### Preferred Flow (New Projects)
-1. Run architecture workflow as normal
-2. Architect agent automatically generates `coding-standards.md` as final deliverable (via critical_action)
-3. Standards are enforced from the first dev story
+### Step 1: One-Time Setup (MANDATORY after install)
 
-### Manual Flow (Existing Projects)
-Run: `"set up coding standards"` — the workflow scans for architecture doc, generates standards, and wires up agents.
+After BMAD is installed with this module, you MUST run the setup workflow once:
+
+```
+"set up coding standards"
+```
+
+This does four things:
+1. Scans your project for architecture doc and tech stack
+2. Generates `coding-standards.md` with rules (interactive — you review and approve)
+3. Updates agent customize.yaml files so dev/QA/architect agents load the standards
+4. Updates workflow configs so code-review, retrospective, and create-story use the standards
+
+**Why is this mandatory?** BMAD currently has no post-install hook mechanism. The module installs its files, but agents don't know about the coding standards until the setup workflow configures them. After this one-time setup, everything is automatic.
+
+### Step 2: From Here, Everything is Automatic
+
+After setup, the system works without intervention:
+- Architect generates/maintains coding standards as part of architecture work
+- Dev/QA agents load standards before every task
+- Code review checks compliance and grows the standards
+- Retrospective aggregates process learnings
+- Create-story loads previous retro for cross-epic learning
 
 ## Module Structure
 
@@ -81,15 +98,25 @@ src/
 
 ## Known Limitations
 
-1. **Module format uncertainty** — The module.yaml structure is based on observed patterns from existing BMAD modules (CIS, TEA). The installer may expect additional fields or a different structure. Testing with the actual installer is needed.
+1. **One-time setup required** — BMAD has no post-install hook mechanism, so the setup workflow must be run manually after installation. The BMAD maintainers could potentially add post-install hooks to make this automatic in the future.
 
-2. **Customize.yaml patching is manual** — BMAD does not have a native "patch" mechanism for customize.yaml files. The setup workflow instructs the AI agent to read, merge, and write YAML. This works but is more fragile than a native merge system.
+2. **Module folder copying uncertainty** — The BMAD installer may not copy all module subfolders (protocols/, customizations/). If the setup workflow can't find the patch files or protocols, they may need to be manually verified. The setup workflow checks for this and provides guidance.
 
-3. **Architecture workflow not modified** — The architect's critical_action instructs coding standards generation, but the core architecture WORKFLOW is not changed. The critical_action fires at agent activation, not at workflow completion. Ideally, the architecture workflow would have a native final step for this. This would require a change to the core BMM architecture workflow.
+3. **Customize.yaml patching is manual** — BMAD does not have a native "patch" mechanism for customize.yaml files. The setup workflow instructs the AI agent to read, merge, and write YAML. This works but is more fragile than a native merge system.
 
-4. **Research protocol requires web access for full effectiveness** — Without web search or Context7 MCP, the protocol operates in degraded mode where recommendations are marked as unverified. The protocol is still valuable (forces alternatives comparison, license checks, structured thinking) but cannot verify current repo status.
+4. **Architecture workflow not modified** — The architect's critical_action instructs coding standards generation, but the core architecture WORKFLOW is not changed. Ideally, the architecture workflow would have a native final step for generating coding standards. This would require a change to the core BMM module.
 
-5. **Tested with BMAD v6.0.4** — Compatibility with other versions is untested.
+5. **Research protocols require web access for full effectiveness** — Without web search or Context7 MCP, protocols operate in degraded mode where recommendations are marked as unverified. Still valuable for structured thinking, but cannot verify current technology status.
+
+6. **Tested with BMAD v6.0.4** — Compatibility with other versions is untested.
+
+## Suggestions for BMAD Core
+
+If the BMAD maintainers find this module valuable, these core changes would improve integration:
+
+1. **Post-install hooks** — Allow modules to declare a setup workflow that runs automatically after installation
+2. **Customize.yaml merge mechanism** — Allow modules to declare patches that get merged into existing agent customize.yaml files during install
+3. **Architecture workflow final step** — Add an optional final step to the architecture workflow for generating companion documents (like coding standards)
 
 ## Origin
 
