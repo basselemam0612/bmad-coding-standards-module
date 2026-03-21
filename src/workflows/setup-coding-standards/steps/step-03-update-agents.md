@@ -189,10 +189,26 @@ Renumber the old final step accordingly. The new step:
   <step n="5" goal="Update coding-standards.md with new violation patterns">
     <critical>This step closes the feedback loop — violations you find HERE prevent the dev agent from repeating them in FUTURE stories</critical>
 
-    <action>Review all findings from Steps 3-4 and identify violation patterns NOT already covered by an existing rule in coding-standards.md</action>
+    <critical>ONLY rules about HOW to write code belong in coding-standards.md. Apply this litmus test to EVERY finding:
+
+      ✅ CODING STANDARD — about HOW code is written (tooling, syntax, framework usage, patterns):
+         "Always create migrations after schema changes" → HOW to handle Prisma schema updates
+         "Use ConfigService not process.env" → HOW to access configuration
+         "Resolve Select labels manually in base-ui" → HOW to use a specific UI component correctly
+
+      ❌ NOT A CODING STANDARD — about WHAT the code does (business logic, feature behavior, domain rules):
+         "Deduplicate wipe commands before queuing" → WHAT the wipe feature should do
+         "Validate device status before sending commands" → WHAT the command feature requires
+
+      The test: Strip the feature context. Does the rule still make sense for a dev building a COMPLETELY UNRELATED feature?
+         "Use ConfigService" → Yes, any feature needs config → ✅ STANDARD
+         "Deduplicate wipe commands" → No, only wipe feature → ❌ BUG FIX, not a standard
+    </critical>
+
+    <action>Review all findings from Step 3-4. For each finding, apply the litmus test above. Only findings about HOW code is written (not WHAT features do) qualify as new coding standards.</action>
     <action>Check the story file's Dev Notes section — if the dev documented workarounds or technology limitations:
       1. Verify the resolution was the correct approach
-      2. Determine if the pattern should become a new coding standard rule
+      2. Apply the HOW vs WHAT litmus test — only HOW-to-write-code patterns become rules
     </action>
 
     <check if="new violation patterns found that are NOT covered by existing rules">
