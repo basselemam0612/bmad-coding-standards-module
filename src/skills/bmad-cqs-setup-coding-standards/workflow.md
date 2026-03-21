@@ -91,14 +91,6 @@ For each patch file, APPEND (never overwrite) the `critical_actions` and `memori
 **code-review/checklist.md** — Add "Coding standards checked" + "Dev Notes reviewed" + "New rules added"
 **qa-generate-e2e-tests/checklist.md** — Add "Tests verify coding standards compliance"
 
-### Register CQS Skill
-
-Copy the skill to the IDE skills folder so `/bmad-cqs-setup-coding-standards` works as a slash command:
-
-```bash
-cp -r _bmad/cqs/skills/bmad-cqs-setup-coding-standards .claude/skills/
-```
-
 ### Verify Protocol Files
 
 Confirm these exist at `{project-root}/_bmad/cqs/protocols/`:

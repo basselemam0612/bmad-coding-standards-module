@@ -142,20 +142,6 @@ Add to Test Quality section:
 - [ ] Tests verify coding standards compliance where applicable (correct components, brand colors, permission gating)
 ```
 
-## Register CQS Skill for IDE
-
-Copy the CQS skill to the IDE skills folder so `/bmad-cqs-setup-coding-standards` works as a slash command for future use:
-
-```bash
-cp -r {project-root}/_bmad/cqs/skills/bmad-cqs-setup-coding-standards {project-root}/.claude/skills/
-```
-
-If `.claude/skills/` doesn't exist (older BMAD version using `.claude/commands/`), copy the skill's `SKILL.md` content as a single command file instead:
-
-```bash
-cp {project-root}/_bmad/cqs/skills/bmad-cqs-setup-coding-standards/SKILL.md {project-root}/.claude/commands/bmad-cqs-setup-coding-standards.md
-```
-
 ## Verify Protocol Files
 
 Verify that the following protocol files exist at their expected locations (they should have been copied during module installation):
