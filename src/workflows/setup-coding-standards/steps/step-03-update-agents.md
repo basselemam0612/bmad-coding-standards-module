@@ -144,6 +144,45 @@ Find the REFACTOR PHASE section and replace `"Ensure code follows architecture p
 
 Edit `{project-root}/_bmad/bmm/workflows/4-implementation/code-review/instructions.xml`:
 
+**In Step 1** (goal: "Load story and discover changes"):
+After the `<invoke-protocol name="discover_inputs" />` line, replace:
+```xml
+    <action>Load {project_context} for coding standards (if exists)</action>
+```
+with:
+```xml
+    <action>Load {project_context} for additional project-wide patterns (if exists)</action>
+
+    <critical>coding-standards.md MUST be loaded via discover_inputs — this is your primary reference for what the dev should have followed</critical>
+    <check if="coding_standards content was NOT loaded">
+      <output>⚠️ coding-standards.md not found — review will proceed but cannot verify standards compliance</output>
+    </check>
+```
+
+**In Step 2** (goal: "Build review attack plan"):
+Add `Coding Standards Compliance` to the review plan action (insert as item 3):
+```
+      3. **Coding Standards Compliance**: Check every changed file against loaded coding-standards.md rules
+```
+
+**In Step 3** (goal: "Execute adversarial review"):
+Before the "Code Quality Deep Dive" comment, add:
+```xml
+    <!-- Coding Standards Compliance -->
+    <check if="coding_standards content was loaded">
+      <action>For EACH file in comprehensive review list, check against ALL applicable coding-standards.md rules:
+        - Universal rules (U-*): shared constants, magic numbers, module boundaries, error handling
+        - Frontend rules (FE-*): correct components, brand colors, state management, permission gating
+        - Backend rules (BE-*): ConfigService, DTOs, security headers, structured logging
+        - Database rules (DB-*): FK onDelete, concurrency, indexing
+        - Security rules (SC-*): CSRF, rate limiting, session cookies
+        - Testing rules (TS-*): shared helpers, cleanup, meaningful assertions
+        - Any other applicable category
+        Each violation = finding with rule ID reference (e.g., "Violates FE-003: must use brand colors via theme")
+      </action>
+    </check>
+```
+
 **Add a NEW step between the current "Present findings" step and the "Update story status" step.**
 Renumber the old final step accordingly. The new step:
 ```xml
@@ -204,6 +243,71 @@ Add after "Architecture/standards docs loaded":
 - [ ] New violation patterns not in coding-standards.md identified and added as new rules
 ```
 
+### qa-generate-e2e-tests workflow
+
+Edit `{project-root}/_bmad/bmm/workflows/qa-generate-e2e-tests/workflow.yaml`:
+
+If `planning_artifacts` variable not present, add:
+```yaml
+planning_artifacts: "{config_source}:planning_artifacts"
+```
+
+Add `coding_standards` to `input_file_patterns` (create section if not present):
+```yaml
+input_file_patterns:
+  coding_standards:
+    description: "Project coding standards — MUST be loaded and verified against when generating tests. Tests should verify implementation complies with these standards where applicable (correct components, brand colors, permission gating, security patterns)."
+    whole: "{planning_artifacts}/*coding-standards*.md"
+    load_strategy: "FULL_LOAD"
+```
+
+Edit `{project-root}/_bmad/bmm/workflows/qa-generate-e2e-tests/instructions.md`:
+
+Add a new step **before** "Step 0: Detect Test Framework" (rename existing Step 0 to Step 0b):
+```markdown
+### Step 0a: Load Coding Standards
+
+Load coding-standards.md via the `discover_inputs` protocol (defined in workflow.yaml).
+
+- If loaded: Use these rules to inform test generation — tests should verify the implementation follows coding standards where applicable (correct UI components, brand colors via theme, permission gating, security patterns, proper error handling)
+- If not found: Proceed without standards verification but note this gap in the summary
+```
+
+### quick-dev workflow
+
+Edit `{project-root}/_bmad/bmm/workflows/bmad-quick-flow/quick-dev/steps/step-01-mode-detection.md`:
+
+**In section "2. Load Project Context"**, rename to "2. Load Project Context and Coding Standards" and add after the project_context loading:
+```markdown
+**CRITICAL — Load Coding Standards:**
+
+- Search for `{project-root}/_bmad-output/planning-artifacts/coding-standards.md` (or glob `**/planning-artifacts/*coding-standards*.md`)
+- If found: Load it completely and store as `{coding_standards}`. You MUST follow every rule during implementation. Pay special attention to rules sourced from "Code Review" — these are patterns previous dev agents violated.
+- If NOT found: Warn the user: "Coding standards not found — run /setup-coding-standards to generate them." Proceed only if user approves.
+```
+
+Add `{coding_standards}` to SUCCESS METRICS:
+```
+- Coding standards loaded if exists (`{coding_standards}`)
+```
+
+Edit `{project-root}/_bmad/bmm/workflows/bmad-quick-flow/quick-dev/steps/step-03-execute.md`:
+
+Add `{coding_standards}` to AVAILABLE STATE:
+```
+- `{coding_standards}` - Coding standards rules (if exists) — MUST follow every rule
+```
+
+In the "2. Implement" section, add:
+```
+- **CRITICAL:** Cross-check every change against `{coding_standards}` rules — violations found by code review become permanent rules, repeating them is unacceptable. Verify: correct components (FE rules), proper validation (BE rules), security patterns (SC rules), and all universal rules (U rules)
+```
+
+Add to FAILURE MODES:
+```
+- Violating coding-standards.md rules (if loaded)
+```
+
 ### qa-generate-e2e-tests checklist
 
 Edit `{project-root}/_bmad/bmm/workflows/qa-generate-e2e-tests/checklist.md`:
@@ -236,14 +340,19 @@ Updated Agents:
   bmm-quick-flow   — Coding standards enforcement (READ) + issue documentation in spec notes
 
 Updated Workflows:
-  dev-story        — Loads coding-standards.md before implementation + enforces rules during refactor phase
-  code-review      — Loads coding-standards.md + checks Dev Notes + appends new rules + explicit write-back step
-  retrospective    — Loads story Dev Notes as primary retro data
-  create-story     — Loads previous retrospective for cross-epic learning
+  dev-story            — Loads coding-standards.md before implementation + enforces rules during refactor phase
+  code-review          — Loads coding-standards.md + checks Dev Notes + appends new rules + explicit write-back step
+  qa-generate-e2e-tests — Loads coding-standards.md + tests verify standards compliance
+  quick-dev            — Loads coding-standards.md at init + enforces during execution
+  retrospective        — Loads story Dev Notes as primary retro data
+  create-story         — Loads previous retrospective for cross-epic learning
 
 Patched Instructions:
-  dev-story/instructions.xml    — Added discover_inputs protocol + coding standards enforcement in Steps 2 & 5
-  code-review/instructions.xml  — Added new Step 5 for writing violations back to coding-standards.md
+  dev-story/instructions.xml        — Added discover_inputs protocol + coding standards enforcement in Steps 2 & 5
+  code-review/instructions.xml      — Added standards compliance in Steps 1-3 + new Step 5 for writing violations back
+  qa-generate-e2e-tests/instructions.md — Added Step 0a for loading coding standards before test generation
+  quick-dev/step-01-mode-detection.md   — Added coding standards loading alongside project context
+  quick-dev/step-03-execute.md          — Added coding standards cross-check during implementation
 
 Installed Protocols:
   research-validation-protocol.md — Architect tech research checklist
