@@ -45,24 +45,17 @@ Includes a **degraded mode** for environments without web access — recommendat
 npx bmad-method install --custom-content /path/to/bmad-coding-standards-module/src
 ```
 
-After install, copy the skill to your IDE's skills folder (one-time, the BMAD installer doesn't auto-register custom module skills yet):
-
-```bash
-# From your project root:
-cp -r _bmad/cqs/skills/bmad-cqs-setup-coding-standards .claude/skills/
-```
-
 ## Usage
 
 ### Step 1: One-Time Setup (MANDATORY after install)
 
-After install and skill copy, run the setup:
+After install, simply tell your AI agent:
 
 ```
-/bmad-cqs-setup-coding-standards
+"set up coding standards"
 ```
 
-Or simply ask your agent: "set up coding standards"
+The agent finds the CQS workflow automatically and runs it. As part of the setup, it registers itself as a slash command for future use.
 
 This does four things:
 1. Scans your project for architecture doc and tech stack
