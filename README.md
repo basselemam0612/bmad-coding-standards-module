@@ -45,15 +45,24 @@ Includes a **degraded mode** for environments without web access — recommendat
 npx bmad-method install --custom-content /path/to/bmad-coding-standards-module/src
 ```
 
+After install, copy the skill to your IDE's skills folder (one-time, the BMAD installer doesn't auto-register custom module skills yet):
+
+```bash
+# From your project root:
+cp -r _bmad/cqs/skills/bmad-cqs-setup-coding-standards .claude/skills/
+```
+
 ## Usage
 
 ### Step 1: One-Time Setup (MANDATORY after install)
 
-After BMAD is installed with this module, you MUST run the setup workflow once:
+After install and skill copy, run the setup:
 
 ```
-"set up coding standards"
+/bmad-cqs-setup-coding-standards
 ```
+
+Or simply ask your agent: "set up coding standards"
 
 This does four things:
 1. Scans your project for architecture doc and tech stack
