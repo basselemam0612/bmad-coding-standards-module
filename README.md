@@ -1,6 +1,8 @@
 # BMad Code Quality Standards (CQS) Module
 
-> **Status: Community Suggestion / RFC** — This module was born from real-world experience building software with BMAD v6 and AI agents. It addresses two gaps discovered during development: (1) AI agents repeatedly violate architecture decisions because rules are buried in large docs, and (2) AI architects can recommend technologies based on outdated or poorly researched data. This is a proposal for community feedback and testing, not a production-ready module.
+> **Important Note:** This module is an experiment — something I'm actively testing on my own project. I am not a software engineer; I use AI to build apps. I cannot say this is 100% complete or that it fully solves the problem. It mitigates repeated AI violations significantly in my experience, but it's still a work in progress.
+>
+> I shared it because maybe it helps someone, or maybe actual developers working on BMAD can take the idea further and make it better. If you think it can be enhanced, or even if you think it's not a good approach at all — I'm genuinely happy to hear either way. Open to all feedback.
 
 ## The Problems This Solves
 
