@@ -25,7 +25,7 @@ BMAD agents are then wired to use this document:
 - **Code Review** checks compliance and **appends new rules** for new violation types (READ+WRITE)
 - **Architect** maintains it when architecture changes (READ+WRITE)
 
-The result: violations caught once become rules that prevent recurrence.
+The goal: violations caught once become rules that help mitigate recurrence. It doesn't eliminate the problem entirely, but significantly reduces repeated violations in practice.
 
 ### Research Validation Protocol (Problem 2)
 

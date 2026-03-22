@@ -212,8 +212,10 @@ Renumber the old final step accordingly. The new step:
     </action>
 
     <check if="new violation patterns found that are NOT covered by existing rules">
-      <action>For EACH new pattern, draft a new rule in the correct section of coding-standards.md:
-        - Assign next available ID in that section (e.g., if last is FE-012, new is FE-013)
+      <critical>NEVER overwrite, rename, or renumber existing rules. Existing rule IDs are PERMANENT — they may be referenced in story files, commit messages, and other documentation. Always APPEND new rules AFTER the last rule in the section.</critical>
+      <action>For EACH new pattern, draft a new rule APPENDED to the correct section of coding-standards.md:
+        - Find the LAST rule ID in that section (e.g., if last is BE-010, new is BE-011)
+        - NEVER replace or renumber an existing rule — add yours AFTER it
         - Follow the DO/DON'T/WHY/SOURCE format exactly
         - Set SOURCE to "Code Review — Story {{story_key}} ({{date}})"
       </action>
