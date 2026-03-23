@@ -98,7 +98,15 @@ Add `story_dev_notes` as the FIRST entry in `input_file_patterns`:
 
 Edit `{project-root}/_bmad/bmm/workflows/4-implementation/create-story/workflow.yaml`:
 
-Add `previous_retrospective` as the FIRST entry in `input_file_patterns`:
+Add `coding_standards` as the FIRST entry in `input_file_patterns`:
+```yaml
+  coding_standards:
+    description: "Project coding standards — MUST be loaded when writing Dev Notes. Dev Notes guidance MUST NOT contradict any coding standard rule. If a Dev Notes section says 'use X' and a coding standard says 'never use X', the coding standard wins. Cross-reference every piece of implementation guidance against these rules."
+    whole: "{planning_artifacts}/*coding-standards*.md"
+    load_strategy: "FULL_LOAD"
+```
+
+Add `previous_retrospective` after `coding_standards`:
 ```yaml
   previous_retrospective:
     description: "Load ONLY the most recent completed retrospective (highest epic number). Each retro already contains cumulative learnings from all previous retros, so only the latest is needed. Use its process improvements and action items to create better-scoped stories and avoid repeating past mistakes."
@@ -130,6 +138,27 @@ Edit `{project-root}/_bmad/bmm/workflows/4-implementation/dev-story/instructions
       <ask>Proceed without coding standards? (y/n)</ask>
       <action if="user says no">HALT</action>
     </check>
+```
+
+**In Step 8** (goal: "Validate and mark task complete"):
+Add BEFORE the existing validation gates (before "Verify ALL tests..."):
+```xml
+    <!-- CODING STANDARDS SELF-CHECK — Re-read rules for files you just changed -->
+    <critical>BEFORE marking this task complete, re-check your work against coding-standards.md.
+      Context window pressure causes standards loaded in Step 2 to fade. This self-check counters that.</critical>
+    <action>List every file you created or modified in this task</action>
+    <action>For each file, identify which coding standard categories apply:
+      - .tsx/.ts frontend files → check FE-*, I18N-*, UX-* rules
+      - .ts backend files → check BE-*, SC-* rules
+      - .prisma files → check DB-* rules
+      - test files → check TS-* rules
+      - ALL files → check U-* rules
+    </action>
+    <action>Spot-check the 3 most common violations:
+      1. Hardcoded strings/values that should be shared constants (U-001) — especially when EXTENDING existing code that already has hardcoded values
+      2. Cache invalidation — trace ALL entities affected by your mutation, not just the obvious one (FE-017)
+      3. Code copied from existing files — does the existing pattern violate a standard? If yes, fix BOTH the copy and the original (U-007)
+    </action>
 ```
 
 **In Step 5** (goal: "Implement task"):
@@ -261,6 +290,26 @@ Add after "Architecture/standards docs loaded":
 - [ ] New violation patterns not in coding-standards.md identified and added as new rules
 ```
 
+### create-story instructions.xml
+
+Edit `{project-root}/_bmad/bmm/workflows/4-implementation/create-story/instructions.xml`:
+
+**In Step 5** (goal: "Create comprehensive story file"), BEFORE the "Project context reference" template-output, add:
+```xml
+    <!-- Coding standards cross-reference — CRITICAL -->
+    <check if="coding_standards content was loaded">
+      <critical>BEFORE saving the story file, cross-reference EVERY piece of implementation guidance in Dev Notes against coding-standards.md.
+        The Dev Notes MUST NOT contain guidance that contradicts any coding standard rule. Common traps:
+        - Dev Notes saying "use the string 'VALUE'" when U-001 requires shared constants
+        - Dev Notes saying "no cache invalidation needed" when FE-017 requires invalidating related caches
+        - Dev Notes showing code snippets with hardcoded values, process.env, or raw SQL
+        If any Dev Notes guidance contradicts a standard, FIX the Dev Notes to reference the correct pattern from coding-standards.md.
+      </critical>
+      <action>Scan all Dev Notes sections for guidance that conflicts with loaded coding standards</action>
+      <action>For each conflict found: rewrite the Dev Notes to use the correct pattern (e.g., "Use `PERSON_STATUS.INACTIVE` from @i-access/shared" instead of "use the string 'INACTIVE'")</action>
+    </check>
+```
+
 ### qa-generate-e2e-tests workflow
 
 Edit `{project-root}/_bmad/bmm/workflows/qa-generate-e2e-tests/workflow.yaml`:
@@ -366,8 +415,9 @@ Updated Workflows:
   create-story         — Loads previous retrospective for cross-epic learning
 
 Patched Instructions:
-  dev-story/instructions.xml        — Added discover_inputs protocol + coding standards enforcement in Steps 2 & 5
+  dev-story/instructions.xml        — Added discover_inputs in Step 2, enforcement in Step 5, post-task self-check in Step 8
   code-review/instructions.xml      — Added standards compliance in Steps 1-3 + new Step 5 for writing violations back
+  create-story/instructions.xml     — Added Dev Notes cross-reference against coding standards before saving
   qa-generate-e2e-tests/instructions.md — Added Step 0a for loading coding standards before test generation
   quick-dev/step-01-mode-detection.md   — Added coding standards loading alongside project context
   quick-dev/step-03-execute.md          — Added coding standards cross-check during implementation
