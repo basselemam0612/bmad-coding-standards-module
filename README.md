@@ -63,18 +63,20 @@ This does four things:
 1. Scans your project for architecture doc and tech stack
 2. Generates `coding-standards.md` with rules (interactive — you review and approve)
 3. Updates agent customize.yaml files so dev/QA/architect agents load the standards
-4. Updates workflow configs so code-review, retrospective, and create-story use the standards
+4. Patches workflow configs AND instruction files so dev-story, code-review, create-story, QA, and quick-dev all enforce the standards at runtime
 
 **Why is this mandatory?** BMAD currently has no post-install hook mechanism. The module installs its files, but agents don't know about the coding standards until the setup workflow configures them. After this one-time setup, everything is automatic.
 
 ### Step 2: From Here, Everything is Automatic
 
 After setup, the system works without intervention:
-- Architect generates/maintains coding standards as part of architecture work
-- Dev/QA agents load standards before every task
-- Code review checks compliance and grows the standards
-- Retrospective aggregates process learnings
-- Create-story loads previous retro for cross-epic learning
+- **Create-story** loads coding standards and cross-references Dev Notes against them — prevents story specs from containing guidance that contradicts the rules
+- **Dev agent** loads standards before implementation, enforces during refactor phase, and runs a post-task self-check against relevant rule categories before marking each task complete
+- **QA agent** loads standards and verifies tests check compliance where applicable
+- **Quick-flow dev** loads standards at init and cross-checks during execution
+- **Code review** checks compliance per-file with rule ID references, then appends new rules for new violation types (with a HOW vs WHAT filter — only generalizable code practices become rules, not feature-specific bugs)
+- **Retrospective** aggregates process learnings from story Dev Notes
+- **Create-story** also loads previous retrospective for cross-epic learning
 
 ## Module Structure
 
@@ -82,7 +84,8 @@ After setup, the system works without intervention:
 src/
 ├── module.yaml                              # Module definition (code: cqs)
 ├── protocols/
-│   └── research-validation-protocol.md      # 7-check tech verification + degraded mode
+│   ├── research-validation-protocol.md      # 7-check tech verification + degraded mode
+│   └── coding-standards-generation-protocol.md  # 8-step generation with research tiers
 ├── customizations/
 │   ├── bmm-architect.customize.patch.yaml   # Research protocol + standards generation
 │   ├── bmm-dev.customize.patch.yaml         # Standards enforcement (READ)
